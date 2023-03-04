@@ -1,4 +1,4 @@
-import crypto from "node:crypto";
+import bcrypt from "bcryptjs";
 import { prisma } from "../lib/prisma-client";
 
 export class UserService {
@@ -16,20 +16,17 @@ export class UserService {
       throw new Error("Email alreay exists");
     }
 
-    if (passLengthErrorMessage.length < passwordMinLength) {
+    if (password.length < passwordMinLength) {
       throw new Error(passLengthErrorMessage);
     }
 
-    const salt = crypto.randomBytes(16).toString("hex");
-    const hashedPassword = await crypto
-      .pbkdf2Sync(password, salt, 10, 64, "sha512")
-      .toString("hex");
+    const hash = await bcrypt.hash(password, 10);
 
     return await prisma.user.create({
       data: {
         name,
         email,
-        password: hashedPassword,
+        password: hash,
       },
     });
   }

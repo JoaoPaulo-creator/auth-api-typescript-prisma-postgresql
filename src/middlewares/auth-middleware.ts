@@ -5,25 +5,23 @@ interface ITokenPayload {
   iat: number;
 }
 
-export class AuthMiddleware {
-  async authorization(req, res, next) {
-    const { authorization } = req.headers;
+export async function authMiddleware(request, reply, next) {
+  const { authorization }: any = request.headers;
 
-    if (!authorization) {
-      return res.code(401).send({ message: "Unauthorized" });
-    }
+  if (!authorization) {
+    return reply.code(401).send({ message: "Unauthorized" });
+  }
 
-    const token = authorization.replace("Bearer", "").trim();
+  const token = authorization.replace("Bearer", "").trim();
 
-    try {
-      const data = jwt.verify(token, "secret");
-      const { id } = data as ITokenPayload;
+  try {
+    const data = jwt.verify(token, "secret");
+    const { id } = data as ITokenPayload;
 
-      req.userId = id;
+    request.userId = id;
 
-      return next();
-    } catch (error) {
-      return res.code(401).send(error);
-    }
+    return next;
+  } catch (error) {
+    return reply.code(401).send(error);
   }
 }

@@ -2,7 +2,7 @@ import { prisma } from "../lib/prisma-client";
 
 class DeleteUserService {
   async deleteUser(id: string) {
-    const userId = await prisma.user.findUnique({
+    const userId = await prisma.user.delete({
       where: {
         id,
       },
